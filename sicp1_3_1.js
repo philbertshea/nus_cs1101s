@@ -2,6 +2,11 @@
 // integral2 is my attempt at Simpson's Integral
 // integral3 is the most accurate because it avoids rounding errors from repetitive addition
 
+// FLOATING POINT PRECISION
+// Most languages face issues dealing with Multiple decimals
+// Solution is to use number.toPrecision(number_of_digits) [Round it off]
+// Or import Decimal class
+
 function sum(term, a, next, b) {
     return a>b ? 0 : term(a) + sum(term, next(a), next, b);
 }
@@ -81,8 +86,10 @@ function testRounding() {
 }
 //sum_cubes(3, 5);
 //integral(cube, 0, 1, 0.01);
-integral2(cube, 0, 1, 10);
-//integral3(cube, 0, 1, 10);
+integral2(cube, 0, 1, 1000);
+//integral3(cube, 0, 1, 1000);
+0.001*0.001*0.001;
+
 
 
 
