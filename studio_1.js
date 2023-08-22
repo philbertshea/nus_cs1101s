@@ -48,9 +48,13 @@ function other_combos(x) {
 }
 
 // Best method to avoid evaluations
-function other_combos(x) {
-    return math_floor(x/10);
+function other_combos_better(x) {
+    return math_trunc(x/10);
 }
+
+x > 1 ? 0 : x < 2 ? 1 : 2;
+// Evaluate predicate (x>1) FIRST. If true, evaluate 0. If false, evaluate (x<2 ? 1 : 2)
+
 
 other_combos(321);
 //modulo(11,3);
