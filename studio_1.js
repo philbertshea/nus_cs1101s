@@ -47,8 +47,9 @@ function other_combos(x) {
     return x/10 - last_combo(x)/10;
 }
 
-// Best method to avoid evaluations
+// Best method to avoid evaluations: Use math_floor or math_trunc
 function other_combos_better(x) {
+    // return math_floor(x/10);
     return math_trunc(x/10);
 }
 
