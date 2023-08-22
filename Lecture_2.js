@@ -27,10 +27,23 @@ stack_frac(1/2, heart, heart)));
 show(trisection);
 show(quadrisection);
 
+// My attempt: Linear, Recursive Process 
 function section(n, rune) {
-    return sect_iter(0, n, rune);
+    return sect_iter(n, rune);
+}
+// From 1/4 --> 1/3 --> 1/2 --> heart
+function sect_iter(count, rune) {
+    return count===1 ? rune : stack_frac(1/count, rune, sect_iter(count-1, rune));
 }
 
-function sect_iter(count, n, rune) {
-    return count>n ? 1 : sect_iter(count+1, n, rune);
+// My attempt: Linear, Iterative Process
+function section_i(n, rune) {
+    function sect_iter_i(result, count, rune) {
+    return count>n ? result : sect_iter_i(stack_frac(1/count, rune, result), count+1, rune);
 }
+    return sect_iter_i(rune, 2, rune);
+}
+
+show(section_i(6, heart));
+
+show(section(6, heart));
