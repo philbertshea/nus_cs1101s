@@ -19,7 +19,9 @@ function fractal(pic, n) {
     function fract_iter(count) {
         // fract_iter function does the iteration
         // This uses a Recursive Process as there are deferred operations generated
-        return count===n-1 ? helper(count) : beside(helper(count) , fract_iter(count+1));
+        return count===n-1 
+        ? helper(count) 
+        : beside(helper(count) , fract_iter(count+1));
     }
     
     return fract_iter(0);
@@ -45,7 +47,7 @@ show(hook(1/5));
 
 // ---------------------------------------------   Q3
 
-import {square, blank, show, stack, beside, stack_frac, beside_frac, quarter_turn_right, make_cross} from "rune";
+import {square, blank, show, stack, rcross, make_cross, beside, stack_frac, beside_frac, quarter_turn_right, make_cross} from "rune";
 
 // copy your hook function from Question 2 here if required
 
