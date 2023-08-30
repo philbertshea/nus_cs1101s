@@ -83,3 +83,20 @@ display(a(-10, 20)(plus_one)(double, minus_two)(5));
 function fun(x) {
     return t => (u, v) => (x => 2 * x)(t + u + v + x);
 }
+display(fun(1)(2)(3, 4));
+
+// 21/22 RA Q4
+const w1 = 3;
+const x1 = 5;
+const y1 = 7;
+display((w1 => (x1, y1) => (w1 => (y1 => y1 + x1)(w1))(100 * w1 + 10 * y1))(y1)(w1, x1));
+
+// 21/22 RA Q3
+const x = 1;
+display((x => (x => (x => 2 * x)(x + 3))(3 * x + 1))(x + 4));
+
+// 21/22 RA Q4
+function w(w, x) {
+    return x <= 1 ? x : w(x, x - 1);
+}
+w((w,x) => 2 * x + 1, 5);
