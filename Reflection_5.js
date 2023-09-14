@@ -1,3 +1,23 @@
+// Add one to every element in the tree [CHANGE Value of Elements]
+//draw_data(map(x => x + 1, list(1, 2, 3)));
+
+// Filter only elements that are larger than 1 [CHANGE Number of Elements]
+draw_data(filter(x => x > 1, list(1, 2, 3)));
+
+// Create Map using Accumulate
+function map_me(f, xs) {
+    return accumulate((x, y) => pair(f(x), y), null, xs);
+}
+
+draw_data(map_me(x => x + 1, list(1, 2, 3)));
+
+function filter_me(pred, xs) {
+    return accumulate((x, y) => pred(x)
+                                ? pair(x, y)
+                                : y, null, xs);
+}
+
+draw_data(filter_me(x => x > 1, list(1,2,3)));
 // Q1
 function flatten_list(xs) {
     return accumulate(append, null, xs);
