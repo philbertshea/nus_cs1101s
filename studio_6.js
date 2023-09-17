@@ -10,6 +10,7 @@ function remove_duplicates(lst) {
 }
 
 function remove_duplicates_2(lst) {
+    // Use filter instead of member
     function item_in_list(item, lst) {
         return !is_null(display(filter(x => item === x, lst)));
     }
@@ -17,13 +18,26 @@ function remove_duplicates_2(lst) {
         return is_null(xs) 
                ? null
                : display(item_in_list(head(xs), distinct))
-               ? pair(head(xs), helper(tail(xs), pair(head(xs), distinct)))
-               : helper(tail(xs), distinct);
+               ? helper(tail(xs), distinct)
+               : pair(head(xs), helper(tail(xs), pair(head(xs), distinct)));
     }
     return helper(lst, null);
 }
 
-display(remove_duplicates(list(1, 2, 3, 4, 3, 2, 1, 2, 3)));
+function remove_duplicates_3(lst) {
+    // Use filter instead of member
+    function item_in_list(item, lst) {
+        return !is_null(display(filter(x => item === x, lst)));
+    }
+    function helper(x, y, seen) {
+        if(item_in_list(x, seen)) {
+            
+        }
+    }
+    return accumulate(helper, null, lst)
+}
+
+display(remove_duplicates_2(list(1, 2, 3, 4, 3, 2, 1, 2, 3)));
 
 
 function makeup_amount(x, coins) {
@@ -37,11 +51,11 @@ function makeup_amount(x, coins) {
 
         // Combinations that do not use the head coin 
         // for the remaining amount.
-        const combi_B = is_null(tail(coins)) ? null : makeup_amount(x, tail(tail(coins)));
+        const combi_B = makeup_amount(x - head(coins), tail(coins));
 
         // Combinations that use the head coin.
         const combi_C = map(x => append(list(head(coins)), x), 
-                            makeup_amount(x - head(coins), tail(coins)));
+                            combi_B);
 
         return append(combi_A, combi_C);
     }
