@@ -106,6 +106,7 @@ function remove_dup(lst) {
 // list(1), list(2), list(3),
 // list(1,2), list(1,3), list(2,3),
 // list(1,2,3))
+/*
 function subsets(lst) {
     return accumulate((x, y) => append(
                                     map(lst => pair(x, lst), 
@@ -127,23 +128,43 @@ function subsets_sol(xs) {
         const has_x = map(s => pair(head(xs), s), subsets_rest);
         
         // Combine Cases 1 and 2
-        return append(subsets_rest, has_x)
+        return append(subsets_rest, has_x);
     }
-}
+}*/
 
 // permutations(list(1, 2, 3));
 // Result: list(list(1,2,3), list(1,3,2),
 // list(2,1,3), list(2,3,1),
 // list(3,1,2), list(3,2,1))
-
+/*
 function permutations(lst) {
-    function get_prefix
-    function helper(item, xs) {
-        return accumulate((x, ys) => append(member(x, ), 
-                          list(append(xs, list(item))), ys)
+    function get_prefix(x, ys) {
+        return remove(x, member(x, reverse(ys)));
     }
+    function new_list(item, x, xs) {
+        return append(get_prefix(x, xs), 
+                      pair(item, member(x, xs)));
+    }
+    function helper(item, list_of_perm) {
+        // xs is list(list(2, 3), list(3, 2))
+        return accumulate((xs, rem) => append(
+                                        accumulate((x, ys) => append(list(new_list(item, x, xs)), 
+                                                                     ys),
+                                                   list(append(xs, list(item))), 
+                                                   xs), 
+                                       rem), 
+                                       null, 
+                                       list_of_perm);
+    }
+    return is_null(lst) 
+           ? null 
+           : is_null(tail(lst)) 
+           ? list(list(head(lst))) 
+           : helper(head(lst), permutations(tail(lst)));
 }
 
+display_list(permutations(list(1, 2, 3, 4)));
+*/
 function permutations_sol(s) {
     return is_null(s)
            ? list(null)
@@ -151,5 +172,6 @@ function permutations_sol(s) {
                append,
                null,
                map(x => map(p => pair(x, p),
-                            permutations(remove(x, s))), s));
+                            permutations_sol(remove(x, s))), s));
 }
+permutations_sol(list(1));
