@@ -24,7 +24,10 @@ curry(math_pow)(3)(4);*/
 const L = list(2,3);
 set_tail(L, null);*/
 
-function d_reverse(xs) {
+
+// Q1
+
+/*function d_reverse(xs) {
     if (is_null(xs)) {
         return xs;
     } else if (is_null(tail(xs))) {
@@ -38,4 +41,15 @@ function d_reverse(xs) {
 }
 const L = list(2, 3);
 const M = d_reverse(L);
-M;
+M;*/
+
+
+// Q2
+
+const twice = f => (x => f(f(x)));
+const yy = (twice(x => 2 * x + 1))(3);
+yy;
+
+
+// Q3
+
