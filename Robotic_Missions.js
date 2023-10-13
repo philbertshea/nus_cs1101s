@@ -96,3 +96,89 @@ ev3_runToAbsolutePosition(ev3_motorB(),15,1);
 
 
 // Mission 2
+
+// Q1
+// Your program here.
+const sensor = ev3_ultrasonicSensor();
+const stopNow = false;
+while(!stopNow) {
+    ev3_ultrasonicSensorDistance(sensor);
+    ev3_pause(1000);
+}
+
+// Q2
+const sensor = ev3_ultrasonicSensor();
+const motorL = ev3_motorB(); //replace with whatever left motor is
+const motorR = ev3_motorC(); //replace with whatever right motor is
+
+ev3_motorSetSpeed(motorB, 100);
+ev3_motorSetSpeed(motorC, 100);
+    // Actually gets the motor to move
+ev3_motorStart(motorB); 
+ev3_motorStart(motorC); 
+
+while(ev3_ultrasonicSensorDistance(sensor) > 10) {
+    ev3_pause(100);
+}
+// within 10cm
+ev3_motorStop(motorB);
+ev3_motorStop(motorC);
+
+// Stopped
+
+ev3_motorSetSpeed(motorB, -20.463 * 6); // 6cm per sec
+ev3_motorSetSpeed(motorC, -20.463 * 6); // 6cm per sec
+
+// Start reversing
+ev3_motorStart(motorB); 
+ev3_motorStart(motorC); 
+ev3_pause(5000); // run for 5s
+ev3_motorStop(motorB); 
+ev3_motorStop(motorC); 
+
+// Q3
+
+const sensor = ev3_ultrasonicSensor();
+const motorL = ev3_motorB(); //replace with whatever left motor is
+const motorR = ev3_motorC(); //replace with whatever right motor is
+
+ev3_motorSetSpeed(motorB, 100);
+ev3_motorSetSpeed(motorC, 100);
+    // Actually gets the motor to move
+ev3_motorStart(motorB); 
+ev3_motorStart(motorC); 
+
+while (ev3_ultrasonicSensorDistance(sensor) > 10) {
+    ev3_pause(100);
+}
+// Stopped
+ev3_motorStop(motorB);
+ev3_motorStop(motorC);
+
+// Rotate 50% left 50% right
+function rotate(deg, clockwise) { // in degrees
+    ev3_runToRelativePosition(clockwise ? motorL : motorR, 4.28582 * deg, 4.28582 * deg);
+    ev3_pause(1000);
+    ev3_motorGetPosition(motorR);
+}
+
+rotate(90, math_random() < 0.5);
+
+// Walk for length of box
+
+function straight(dist) { // distance is in cm
+    ev3_motorSetSpeed(motorB, 20.463 * dist);
+    ev3_motorSetSpeed(motorC, 20.463 * dist);
+    // Actually gets the motor to move
+    ev3_motorStart(motorB); 
+    ev3_motorStart(motorC); 
+    // Lets the motor move for one second
+    ev3_pause(100);
+    // Stops the motor
+    ev3_motorStop(motorB);
+    ev3_motorStop(motorC);
+}
+
+straight();//lengthofbox
+
+
