@@ -179,6 +179,8 @@ function straight(dist) { // distance is in cm
     ev3_motorStop(motorC);
 }
 
-straight();//lengthofbox
+while(true) {
+    
+}
 
 
