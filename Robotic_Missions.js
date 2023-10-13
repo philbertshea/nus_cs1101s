@@ -1,186 +1,319 @@
 //import {ev3_speak} from "ev3";
 // Mission 1
-
+/*
 // Q1
-ev3_speak("Hello Vera");
+ev3_speak("Hello");
 
-// 2
-// this isnt right i think the position is not exact to cm, 
-// i think the position refers to the radii of rotation of the motor 
-// we may need to consider the radius of the wheel
-// let radius = r; circumference = 2math_PIradius;
-// so lets say we use the ev3_runForTime
-// we need to find revolution per sec 
-// with circumference and rev per sec i think we can find the time 
-// then we can make the bot move 10cm...
-
-// Assuming the diameter of the robot wheels is 5.6cm as indicated online.
-
+// Q2
 
 const motorL = ev3_motorB(); //replace with whatever left motor is
 const motorR = ev3_motorC(); //replace with whatever right motor is
 
-ev3_motorSetSpeed(motorB, 204.63);
-ev3_motorSetSpeed(motorC, 204.63);
+ev3_motorSetSpeed(motorL, 180);
+ev3_motorSetSpeed(motorR, 180);
 // Actually gets the motor to move
-ev3_motorStart(motorB); 
-ev3_motorStart(motorC); 
+ev3_motorStart(motorL); 
+ev3_motorStart(motorR); 
 // Lets the motor move for one second
-ev3_pause(100);
-// Stops the motor
-ev3_motorStop(motorB);
-ev3_motorStop(motorC);
-
-
-// Q3 
-
-ev3_runToRelativePosition(motorR, 385.724, 385.724);
 ev3_pause(1000);
-ev3_motorGetPosition(motorR);
+// Stops the motor
+ev3_motorStop(motorL);
+ev3_motorStop(motorR);
 
 
-// Q4 Alt
+// Q3
+const motorL = ev3_motorB(); //replace with whatever left motor is
+const motorR = ev3_motorC(); //replace with whatever right motor is
+
+ev3_motorSetSpeed(motorL, -165);
+ev3_motorSetSpeed(motorR, 165);
+
+ev3_motorStart(motorL); 
+ev3_motorStart(motorR); 
+
+ev3_pause(1000);
+
+ev3_motorStop(motorL);
+ev3_motorStop(motorR);
+*/
+
+/*
+// Q4 
 const motorL = ev3_motorB(); //replace with whatever left motor is
 const motorR = ev3_motorC(); //replace with whatever right motor is
 
 function straight(dist) { // distance is in cm
-    ev3_motorSetSpeed(motorB, 20.463 * dist);
-    ev3_motorSetSpeed(motorC, 20.463 * dist);
+    ev3_motorSetSpeed(motorL, 18 * dist);
+    ev3_motorSetSpeed(motorR, 18 * dist);
     // Actually gets the motor to move
-    ev3_motorStart(motorB); 
-    ev3_motorStart(motorC); 
+    ev3_motorStart(motorL); 
+    ev3_motorStart(motorR); 
     // Lets the motor move for one second
-    ev3_pause(100);
+    ev3_pause(1000);
     // Stops the motor
-    ev3_motorStop(motorB);
-    ev3_motorStop(motorC);
+    ev3_motorStop(motorL);
+    ev3_motorStop(motorR);
 }
 
-function rotate(deg, clockwise) { // in degrees
-    ev3_runToRelativePosition(clockwise ? motorL : motorR, 4.28582 * deg, 4.28582 * deg);
+function rotate(clockwise) {
+    if (clockwise) {
+        ev3_motorSetSpeed(motorL, 165);
+        ev3_motorSetSpeed(motorR, -165);
+    } else {
+        ev3_motorSetSpeed(motorL, -165);
+        ev3_motorSetSpeed(motorR, 165);
+    }
+
+    ev3_motorStart(motorL); 
+    ev3_motorStart(motorR); 
+
     ev3_pause(1000);
-    ev3_motorGetPosition(motorR);
+
+    ev3_motorStop(motorL);
+    ev3_motorStop(motorR);
 }
 
 straight(10);
-rotate(90, false);
+rotate(false);
 straight(5);
-rotate(90, true);
+rotate(true);
 straight(15);
 
-/*
-// Q4
-
-const anticlock90 = ev3_runForTime(motorR,time,speed) 
-//time and speed same as clock90
-
-ev3_pause(1000);
-ev3_runToAbsolutePosition(ev3_motorA(),10,1);
-ev3_runToAbsolutePosition(ev3_motorB(),10,1);
-ev3_pause(1000);
-anticlock90;
-ev3_pause(1000);
-ev3_runToAbsolutePosition(ev3_motorA(),5,1);
-ev3_runToAbsolutePosition(ev3_motorB(),5,1);
-ev3_pause(1000);
-clock90;
-ev3_pause(1000);
-ev3_runToAbsolutePosition(ev3_motorA(),15,1);
-ev3_runToAbsolutePosition(ev3_motorB(),15,1);
 */
-
-
-
-
-
-
 
 // Mission 2
 
 // Q1
 // Your program here.
+/*
 const sensor = ev3_ultrasonicSensor();
-const stopNow = false;
-while(!stopNow) {
-    ev3_ultrasonicSensorDistance(sensor);
+let i = 0;
+while(i < 10) {
+    i = i + 1;
     ev3_pause(1000);
-}
+    display(ev3_ultrasonicSensorDistance(sensor));
 
+}*/
+
+/*
 // Q2
 const sensor = ev3_ultrasonicSensor();
 const motorL = ev3_motorB(); //replace with whatever left motor is
 const motorR = ev3_motorC(); //replace with whatever right motor is
 
-ev3_motorSetSpeed(motorB, 100);
-ev3_motorSetSpeed(motorC, 100);
+ev3_motorSetSpeed(motorL, 100);
+ev3_motorSetSpeed(motorR, 100);
     // Actually gets the motor to move
-ev3_motorStart(motorB); 
-ev3_motorStart(motorC); 
+ev3_motorStart(motorL); 
+ev3_motorStart(motorR); 
 
-while(ev3_ultrasonicSensorDistance(sensor) > 10) {
+while(ev3_ultrasonicSensorDistance(sensor) > 100) {
     ev3_pause(100);
 }
 // within 10cm
-ev3_motorStop(motorB);
-ev3_motorStop(motorC);
+ev3_motorStop(motorL);
+ev3_motorStop(motorR);
 
 // Stopped
 
-ev3_motorSetSpeed(motorB, -20.463 * 6); // 6cm per sec
-ev3_motorSetSpeed(motorC, -20.463 * 6); // 6cm per sec
+function reverse(dist) { // distance is in cm
+    ev3_motorSetSpeed(motorL, -18 * dist);
+    ev3_motorSetSpeed(motorR, -18 * dist);
+    // Actually gets the motor to move
+    ev3_motorStart(motorL); 
+    ev3_motorStart(motorR); 
+    // Lets the motor move for one second
+    ev3_pause(1000);
+    // Stops the motor
+    ev3_motorStop(motorL);
+    ev3_motorStop(motorR);
+}
 
-// Start reversing
-ev3_motorStart(motorB); 
-ev3_motorStart(motorC); 
-ev3_pause(5000); // run for 5s
-ev3_motorStop(motorB); 
-ev3_motorStop(motorC); 
-
+reverse(30);
+*/
 // Q3
-
+/*
 const sensor = ev3_ultrasonicSensor();
 const motorL = ev3_motorB(); //replace with whatever left motor is
 const motorR = ev3_motorC(); //replace with whatever right motor is
 
-ev3_motorSetSpeed(motorB, 100);
-ev3_motorSetSpeed(motorC, 100);
+ev3_motorSetSpeed(motorL, 100);
+ev3_motorSetSpeed(motorR, 100);
     // Actually gets the motor to move
-ev3_motorStart(motorB); 
-ev3_motorStart(motorC); 
+ev3_motorStart(motorL); 
+ev3_motorStart(motorR); 
 
-while (ev3_ultrasonicSensorDistance(sensor) > 10) {
+while (ev3_ultrasonicSensorDistance(sensor) > 100) {
     ev3_pause(100);
 }
 // Stopped
-ev3_motorStop(motorB);
-ev3_motorStop(motorC);
+ev3_motorStop(motorL);
+ev3_motorStop(motorR);
 
 // Rotate 50% left 50% right
-function rotate(deg, clockwise) { // in degrees
-    ev3_runToRelativePosition(clockwise ? motorL : motorR, 4.28582 * deg, 4.28582 * deg);
+
+function rotate(clockwise) {
+    if (clockwise) {
+        ev3_motorSetSpeed(motorL, 165);
+        ev3_motorSetSpeed(motorR, -165);
+    } else {
+        ev3_motorSetSpeed(motorL, -165);
+        ev3_motorSetSpeed(motorR, 165);
+    }
+
+    ev3_motorStart(motorL); 
+    ev3_motorStart(motorR); 
+
     ev3_pause(1000);
-    ev3_motorGetPosition(motorR);
+
+    ev3_motorStop(motorL);
+    ev3_motorStop(motorR);
 }
 
-rotate(90, math_random() < 0.5);
+const rand = math_random() < 0.5;
+rotate(rand);
 
 // Walk for length of box
 
 function straight(dist) { // distance is in cm
-    ev3_motorSetSpeed(motorB, 20.463 * dist);
-    ev3_motorSetSpeed(motorC, 20.463 * dist);
+    ev3_motorSetSpeed(motorL, 18 * dist);
+    ev3_motorSetSpeed(motorR, 18 * dist);
     // Actually gets the motor to move
-    ev3_motorStart(motorB); 
-    ev3_motorStart(motorC); 
+    ev3_motorStart(motorL); 
+    ev3_motorStart(motorR); 
     // Lets the motor move for one second
-    ev3_pause(100);
+    ev3_pause(1000);
     // Stops the motor
-    ev3_motorStop(motorB);
-    ev3_motorStop(motorC);
+    ev3_motorStop(motorL);
+    ev3_motorStop(motorR);
 }
 
-while(true) {
-    
+straight(10);
+rotate(!rand);
+let i = 0;
+while(i < 2) {
+    if(ev3_ultrasonicSensorDistance(sensor) > 200) {
+        i = i + 1;
+    }
+    rotate(rand);
+    straight(15);
+    rotate(!rand);
 }
+straight(50);
+*/
+
+
+
+// Mission 3
+
+// Q1
+/*
+
+const colorsensor = ev3_colorSensor();
+const touchsensor = ev3_touchSensor2();
+let i = 0;
+while(i < 10 && !ev3_touchSensorPressed(touchsensor)) {
+    i = i + 1;
+    ev3_pause(1000);
+    display(ev3_reflectedLightIntensity(colorsensor));
+}
+/*
+const colorsensor = ev3_colorSensor();
+const touchsensor = ev3_touchSensor2();
+let i = 0;
+if (i = false){
+    terminate
+}
+while(i < 10 || ev3_touchSensorPressed(touchsensor)) {
+    i = i + 1;
+    ev3_pause(1000);
+    display(ev3_reflectedLightIntensity(colorsensor));
+}*/
+
+
+
+
+// Q2
+
+const motorL = ev3_motorB(); //replace with whatever left motor is
+const motorR = ev3_motorC(); //replace with whatever right motor is
+const colorsensor = ev3_colorSensor();
+const touchsensor = ev3_touchSensor2();
+
+function straight(dist) { // distance is in cm
+    ev3_motorSetSpeed(motorL, 18 * dist);
+    ev3_motorSetSpeed(motorR, 18 * dist);
+    // Actually gets the motor to move
+    ev3_motorStart(motorL); 
+    ev3_motorStart(motorR); 
+    // Lets the motor move for one second
+    ev3_pause(1000);
+    // Stops the motor
+    ev3_motorStop(motorL);
+    ev3_motorStop(motorR);
+}
+
+function rotate(clockwise) {
+    if (clockwise) {
+        ev3_motorSetSpeed(motorL, 165);
+        ev3_motorSetSpeed(motorR, -165);
+    } else {
+        ev3_motorSetSpeed(motorL, -165);
+        ev3_motorSetSpeed(motorR, 165);
+    }
+
+    ev3_motorStart(motorL); 
+    ev3_motorStart(motorR); 
+
+    ev3_pause(1000);
+
+    ev3_motorStop(motorL);
+    ev3_motorStop(motorR);
+}
+
+function walk() {
+    if (ev3_touchSensorPressed(touchsensor)) {
+        return 0;
+    }
+    if (ev3_colorSensorGetColor(colorsensor) === 1) {
+        straight(10);
+        walk();
+    } else {
+        // Check Left
+        rotate(false);
+        if (ev3_colorSensorGetColor(colorsensor) === 1) {
+            walk();
+        } else {
+            // Check Right
+            rotate(true);
+            rotate(true);
+            if (ev3_colorSensorGetColor(colorsensor) === 1) {
+                walk();
+            } else {
+                rotate(false);
+                if (ev3_colorSensorGetColor(colorsensor) === 1) {
+                    walk();
+                }
+            }
+        }
+    } 
+}
+
+walk();
+
+// Check Left
+/*
+
+if (ev3_colorSensorGetColor(colorsensor) === 1) {
+    walk();
+} else {
+    rotate(true);
+    rotate(true);
+    if (ev3_colorSensorGetColor(colorsensor) === 1) {
+        walk();
+    }
+}
+// Check Right
+*/
 
 
