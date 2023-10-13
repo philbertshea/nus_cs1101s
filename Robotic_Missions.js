@@ -1,9 +1,10 @@
+//import {ev3_speak} from "ev3";
 // Mission 1
 
 // Q1
-ev3_speak("Hello World");
+ev3_speak("Hello Vera");
 
-// Q2
+// 2
 // this isnt right i think the position is not exact to cm, 
 // i think the position refers to the radii of rotation of the motor 
 // we may need to consider the radius of the wheel
@@ -16,33 +17,58 @@ ev3_speak("Hello World");
 // Assuming the diameter of the robot wheels is 5.6cm as indicated online.
 
 
-const motorL = //ev3_motorA(); replace with whatever left motor is
-const motorR = //ev3_motorB(); replace with whatever right motor is
+const motorL = ev3_motorB(); //replace with whatever left motor is
+const motorR = ev3_motorC(); //replace with whatever right motor is
 
-ev3_runToAbsolutePosition(motorL, 3.57, 1);
-ev3_runToAbsolutePosition(motorR, 3.57, 1);
+ev3_motorSetSpeed(motorB, 204.63);
+ev3_motorSetSpeed(motorC, 204.63);
+// Actually gets the motor to move
+ev3_motorStart(motorB); 
+ev3_motorStart(motorC); 
+// Lets the motor move for one second
+ev3_pause(100);
+// Stops the motor
+ev3_motorStop(motorB);
+ev3_motorStop(motorC);
+
+
+// Q3 
+
+ev3_runToRelativePosition(motorR, 385.724, 385.724);
 ev3_pause(1000);
-
-// Q3
-
-ev3_gyroSensorAngle(ev3_gyroSensor());
-
-// code should turn only one wheel up till gyroSensor detects that ~80 
-// degree turn is completed - underestimate due to network latency etc. 
-// & inertial sensor errors
-
-// or just trial and approximate a time and speed for which the motor will
-// run to achieve a 90 degree turn - easier let's just do this
-
-const clock90 = ev3_runForTime(motorL,time,speed); //time and speed need to trial
-clock90;
+ev3_motorGetPosition(motorR);
 
 
-// Q3 Alternative: By absolutePosition
+// Q4 Alt
+const motorL = ev3_motorB(); //replace with whatever left motor is
+const motorR = ev3_motorC(); //replace with whatever right motor is
 
-ev3_runToAbsolutePosition(motorR, r * math_PI/5.6, 1)
-ev3_pause(1000);
+function straight(dist) { // distance is in cm
+    ev3_motorSetSpeed(motorB, 20.463 * dist);
+    ev3_motorSetSpeed(motorC, 20.463 * dist);
+    // Actually gets the motor to move
+    ev3_motorStart(motorB); 
+    ev3_motorStart(motorC); 
+    // Lets the motor move for one second
+    ev3_pause(100);
+    // Stops the motor
+    ev3_motorStop(motorB);
+    ev3_motorStop(motorC);
+}
 
+function rotate(deg, clockwise) { // in degrees
+    ev3_runToRelativePosition(clockwise ? motorL : motorR, 4.28582 * deg, 4.28582 * deg);
+    ev3_pause(1000);
+    ev3_motorGetPosition(motorR);
+}
+
+straight(10);
+rotate(90, false);
+straight(5);
+rotate(90, true);
+straight(15);
+
+/*
 // Q4
 
 const anticlock90 = ev3_runForTime(motorR,time,speed) 
@@ -61,3 +87,12 @@ clock90;
 ev3_pause(1000);
 ev3_runToAbsolutePosition(ev3_motorA(),15,1);
 ev3_runToAbsolutePosition(ev3_motorB(),15,1);
+*/
+
+
+
+
+
+
+
+// Mission 2
