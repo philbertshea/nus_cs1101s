@@ -156,7 +156,7 @@ function rotate(clockwise) {
     if (clockwise) {
         ev3_motorSetSpeed(motorL, 165);
         ev3_motorSetSpeed(motorR, -165);
-    } else {
+    } else {t
         ev3_motorSetSpeed(motorL, -165);
         ev3_motorSetSpeed(motorR, 165);
     }
@@ -207,16 +207,14 @@ straight(50);
 // Mission 3
 
 // Q1
-/*
 
 const colorsensor = ev3_colorSensor();
 const touchsensor = ev3_touchSensor2();
-let i = 0;
-while(i < 10 && !ev3_touchSensorPressed(touchsensor)) {
-    i = i + 1;
+while(!ev3_touchSensorPressed(touchsensor)) {
     ev3_pause(1000);
     display(ev3_reflectedLightIntensity(colorsensor));
 }
+
 /*
 const colorsensor = ev3_colorSensor();
 const touchsensor = ev3_touchSensor2();
@@ -235,8 +233,8 @@ while(i < 10 || ev3_touchSensorPressed(touchsensor)) {
 
 // Q2
 
-const motorL = ev3_motorB(); //replace with whatever left motor is
-const motorR = ev3_motorC(); //replace with whatever right motor is
+const motorL = ev3_motorB(); 
+const motorR = ev3_motorC(); 
 const colorsensor = ev3_colorSensor();
 const touchsensor = ev3_touchSensor2();
 
@@ -253,14 +251,9 @@ function straight(dist) { // distance is in cm
     ev3_motorStop(motorR);
 }
 
-function rotate(clockwise) {
-    if (clockwise) {
-        ev3_motorSetSpeed(motorL, 165);
-        ev3_motorSetSpeed(motorR, -165);
-    } else {
-        ev3_motorSetSpeed(motorL, -165);
-        ev3_motorSetSpeed(motorR, 165);
-    }
+function rotate(degrees) {
+    ev3_motorSetSpeed(motorL, 165/90*degrees);
+    ev3_motorSetSpeed(motorR, -165/90*degrees);
 
     ev3_motorStart(motorL); 
     ev3_motorStart(motorR); 
@@ -271,49 +264,27 @@ function rotate(clockwise) {
     ev3_motorStop(motorR);
 }
 
+let i = 0;
 function walk() {
-    if (ev3_touchSensorPressed(touchsensor)) {
-        return 0;
+    while(display(ev3_reflectedLightIntensity(colorsensor)) < 1) {
+        straight(5);
+        ev3_pause(3000);
     }
-    if (ev3_colorSensorGetColor(colorsensor) === 1) {
-        straight(10);
+    i = 0;
+}
+
+for(i=0; i<10; i = i + 1) {
+    if (ev3_touchSensorPressed(touchsensor)){
+        break; 
+    }
+    if (display(ev3_reflectedLightIntensity(colorsensor)) < 1) {
         walk();
+        break;
     } else {
-        // Check Left
-        rotate(false);
-        if (ev3_colorSensorGetColor(colorsensor) === 1) {
-            walk();
-        } else {
-            // Check Right
-            rotate(true);
-            rotate(true);
-            if (ev3_colorSensorGetColor(colorsensor) === 1) {
-                walk();
-            } else {
-                rotate(false);
-                if (ev3_colorSensorGetColor(colorsensor) === 1) {
-                    walk();
-                }
-            }
-        }
+        rotate(20 * i * (i%2=== 0 ? -1 : 1));
     } 
 }
 
-walk();
 
-// Check Left
-/*
-
-if (ev3_colorSensorGetColor(colorsensor) === 1) {
-    walk();
-} else {
-    rotate(true);
-    rotate(true);
-    if (ev3_colorSensorGetColor(colorsensor) === 1) {
-        walk();
-    }
-}
-// Check Right
-*/
 
 
