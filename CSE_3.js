@@ -30,7 +30,7 @@ const xs = pair(10, null);
 while (i<2) {
     let p = pair(i, null);
     set_tail(xs, p);
-    xs = tail(xs);
+    //xs = tail(xs);
     i = i + 1;
 }
 
