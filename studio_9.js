@@ -152,3 +152,6 @@ function count_pairs_3(x) {
 }
 count_pairs_3(inf);
 
+
+const A = [];
+A[0][0];
