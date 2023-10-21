@@ -135,3 +135,91 @@ function d_filter(pred, xs) {
         }
     }
 }
+
+// Reverse Array
+
+// Linear Search: Array
+function linear_search(A, v) {
+    const len = array_length(A);
+    let i = 0;
+    while (i<len && A[i] !== v) {
+        i = i + 1;
+    }
+    // Return true if found, else return false
+    return (i<len);
+    // Return index if found, else return -1
+    return (i<len) ? i : -1;
+}
+
+// BINARY SEARCH ONLY WORKS FOR SORTED ARRAYS!!
+// Binary Search: Array, Recursive
+function binary_search(A, v) {
+    function search(low, high) {
+        if (low < high) {
+            return false;
+        } else {
+            const mid = math_floor((low + high)/2);
+            return (v === A[mid]) // return true if found
+                   ||
+                   (v < A[mid]
+                    ? search(low, mid - 1)
+                    : search(mid + 1, high));
+        }
+    }
+}
+
+// Alternative Binary Search
+// search_low: low,mid-1  |  search_high: mid+1,high  |  not_found: low>high
+function binary_search(A, v) {
+    let low = 0;
+    let high = array_length(A) - 1;
+    while (low <= high) {
+        const mid = math_floor((low + high) / 2);
+        if (v === A[mid]) {
+            break;
+        } else if (v < A[mid]) {
+            high = mid - 1;
+        } else {
+            low = mid + 1;
+        }
+    }
+    return (low <= high);
+}
+
+// Selection Sort: Array
+function selection_sort(A) {
+    const len = array_length(A);
+    for (let i=0; i<len-1; i=i+1) {
+        let min_pos = find_min_pos(A, i, len-1);
+        swap(A, j, min_pos);
+    }
+}
+
+function swap(A, x, y) {
+    // MUST pass in A
+    const temp = A[x];
+    A[x] = A[y];
+    A[y] = temp;
+}
+
+function find_min_pos(A, low, high) {
+    let min_pos = low;
+    for (let j = low + 1; j <= high; i = i + 1) {
+        if (A[j] < A[min_pos]) {
+            min_pos = j;
+        }
+    }
+}
+
+
+// Insertion Sort: Array
+function insertion_sort(A) {
+    const len = array_length(A);
+    for (let i=1; i<len; i = i + 1) {
+        let j = i-1;
+        while (j>=0 && A[j] > A[j+1]) {
+            swap(A, j, j+1);
+            j = j - 1;
+        }
+    }
+}
