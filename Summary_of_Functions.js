@@ -52,7 +52,7 @@ function sum(term, a, next, b) {
 }
 
 // Iterative Sum  Time Θ(n)  Space Θ(1) 
-function sum(term, a, next, b) {
+function sum_i(term, a, next, b) {
     // For Iterative, use a function to store accumulator/result and count
     function iter(result, count) {
         return count > b    // End with count>b
@@ -88,7 +88,7 @@ function length(xs) {
 }
 
 // Iterative Length Time Θ(n)  Space Θ(1) 
-function length(xs) {
+function length_i(xs) {
     function iter(ys, count) {
         return is_null(ys) 
                 ? count
@@ -112,7 +112,7 @@ function reverse(xs) {
 }
 
 // Iterative Reverse Time Θ(n)  Space Θ(1)
-function reverse(xs) {
+function reverse_i(xs) {
     function iter(orig, rev) {
         return is_null(orig)
                 ? rev
@@ -154,3 +154,165 @@ function accumulate(op, initial, xs) {
 
 // Accumulate-Dependent Functions
 const list_sum = xs => accumulate((x, y) => x+y, 0, xs);
+const flatten = xs => accumulate(append, null, xs);
+
+function map(f, xs) {
+    return accumulate((x, ys) => pair(f(x), ys), null, xs);
+}
+function filter(pred, xs) {
+    return accumulate((x, ys) => pred(x) 
+                                ? pair(x, ys) 
+                                : ys, 
+                        null, xs);
+}
+function filtered_accumulate(pred, op, initial, xs) {
+    return accumulate((x, ys) => pred(x) 
+                                ? op(x, ys) 
+                                : ys, 
+                       initial, xs);
+}
+
+// A Tree of <numbers> is a list whose elements are <numbers> OR trees of <numbers>
+// list(1, 2, 3, 4) | null | list(list(1, 2), 3, 4)
+
+// Count items in tree: list(list(1, 2), 3, 4)
+function count_data_items(tree) {
+    if (is_null(tree)) {
+        return 0;
+    } else if (is_list(head(tree))) {
+        return count_data_items(head(tree)) + count_data_items(tail(tree));
+    } else {
+        return 1 + count_data_items(tail(tree));
+    }
+}
+
+// Map for Tree
+function map_tree(f, tree) {
+    return map(sub_tree => 
+                !is_list(sub_tree)  // Use is_pair for efficiency
+                ? f(sub_tree)
+                : map_tree(f, sub_tree),
+               tree);
+}
+
+// Tree Sum
+function tree_sum(tree) {
+    return is_null(tree)
+            ? 0
+            : !is_pair(head(tree))
+            ? head(tree) + tree_sum(tail(tree))
+            : tree_sum(head(tree)) + tree_sum(tail(tree));
+}
+
+// Accumulate for Tree
+function accumulate_tree(f, op, initial, tree) { 
+    // f applies to each item, op acts between item and existing accumulated value
+    const fun = (x, ys) => !is_pair(x) 
+                            ? op(f(x), ys)
+                            : op(accumulate_tree(f, op, initial, x), ys);
+    return accumulate(fun, initial, tree);
+}
+
+// Dependent Functions
+const count_data_items = tree => accumulate_tree(x => 1, (x, y) => x + y, 0, tree);
+const tree_sum = tree => accumulate_tree(x => x, (x, y) => x + y, 0, tree);
+const flatten = tree => accumulate(x => list(x), append, null, tree);
+
+// Remove Duplicates
+function remove_duplicates(xs) {
+    return accumulate((x, ys) => is_null(member(x, ys))
+                                    ? pair(x, ys) : ys,
+                        null, xs);
+}
+
+function remove_duplicates_first(xs) {
+    return accumulate((x, ys) => pair(x, remove_duplicates(filter(z => z!==x, ys))),
+                        null, xs);
+}
+remove_duplicates_filter(list(1, 2, 1, 3, 4, 5, 1));
+
+// Make Up Amount
+function makeup_amount(x, coins) {
+    if (x === 0) {
+        return list(null);
+    } else if (x < 0 || is_null(coins)) {
+        return null;
+    } else {
+        const combi_A = makeup_amount(x, tail(coins)); // Do not use first coin
+        const combi_B = makeup_amount(x - head(coins), tail(coins));
+        const combi_C = map(x => pair(head(coins), x), combiB); // Use the first coin
+        return append(combi_A, combi_C);
+    }
+}
+
+// Permutations
+function permutations(s) {
+    return is_null(s)
+            ? list(null)
+            : accumulate(append, null, 
+                map(x => 
+                    map(p => pair(x, p),
+                        permutations(remove(x, s))), s));
+}
+
+// Insertion Sort: List, Recursive
+function insertion_sort(xs) {
+    return is_null(xs)
+           ? xs
+           : insert(head(xs), insertion_sort(tail(xs)));
+}
+function insert(x, xs) {
+    return is_null(xs)
+           ? list(x)
+           : x <= head(xs)
+           ? pair(x, xs)
+           : pair(head(xs), insert(x, tail(xs)));
+}
+
+// Selection Sort: Recursive
+function selection_sort(xs) {
+    if (is_null(xs)) {
+        return xs;
+    } else {
+        const x = smallest(xs);
+        return pair(x, selection_sort(remove(x, s)));
+    }
+}
+function smallest(xs) {
+    return accumulate((x, y) => x < y ? x : y, head(xs), tail(xs));
+}
+
+// Merge Sort: Recursive
+function merge_sort(xs) {
+    if (is_null(xs)) {
+        return xs;
+    } else {
+        const mid = math_floor(length(xs)/2);
+        const left_wish = merge_sort(take(xs, mid));
+        const right_wish = merge_sort(drop(xs, mid));
+        return merge(left_wish, right_wish);
+    }
+}
+function merge(xs, ys) {
+    if (is_null(xs)) {
+        return ys;
+    } else if (is_null(ys)) {
+        return xs;
+    } else {
+        const x = head(xs);
+        const y = head(ys);
+        return x < y 
+               ? pair(x, merge(tail(xs), ys))
+               : pair(y, merge(xs, tail(ys)));
+    }
+}
+function take(xs, n) {
+    return n === 0
+           ? null
+           : pair(head(xs), take(tail(xs), n-1));
+}
+function drop(xs, n) {
+    return n === 0
+           ? xs
+           : drop(tail(xs), n - 1);
+}
