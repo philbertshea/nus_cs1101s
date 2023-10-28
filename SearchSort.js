@@ -136,6 +136,12 @@ function d_filter(pred, xs) {
     }
 }
 
+// Normal Accumulate
+function accumulate(op, initial, xs) {
+    return is_null(xs)
+            ? initial
+            : op(head(xs), accumulate(op, initial, tail(xs)));
+}
 // Reverse Array
 
 // Linear Search: Array
