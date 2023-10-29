@@ -255,7 +255,38 @@ function permutations(s) {
                         permutations(remove(x, s))), s));
 }
 
+
+// Accumulate for Binary Search Tree
+function accumulate_bst(op, initial, bst) {
+    if (is_null(bst)) {
+        return initial;
+    } else {
+        const left_wish = accumulate_bst(op, initial, left_subtree(bst));
+        const right_wish = accumulate_bst(op, initial, right_subtree(bst));
+        const x = value_of(bst);
+        return op(left_wish, op(x, right_wish));
+    }
+}
+
+// Last Comes First
+function last_comes_first(xs) {
+    if (is_null(xs)) {
+        return xs;
+    } else {
+        const wish = last_comes_first(tail(xs));
+        return pair(head(wish), pair(head(xs), tail(wish)));
+    }
+}
+
+// List Sorting
+
 // Insertion Sort: List, Recursive
+// 2 | 13 | 26 | 40 | 8x  [8x]
+// 2 | 13 | 26 | 40x      [40x > 8] --> [8, 40]
+// 2 | 13 | 26x           [26x > 8, 40] --> [8, 26x < 40] --> [8, 26, 40]
+// 2 | 13x                [13x > 8, 26, 40] --> [8, 13 < 26, 40] --> [8, 13, 26, 40]
+// 2x                     [2x < 8, 13, 26, 40] --> [2, 8, 13, 26, 40]
+
 function insertion_sort(xs) {
     return is_null(xs)
            ? xs
@@ -269,7 +300,32 @@ function insert(x, xs) {
            : pair(head(xs), insert(x, tail(xs)));
 }
 
+// Insertion Sort with Compare
+function insertion_sort_cmp(xs, cmp) {
+    return is_null(xs) ? xs
+            : insert_cmp(head(xs),
+                         insertion_sort_cmp(tail(xs), cmp),
+                         cmp);
+}
+function insert_cmp(x, xs, cmp) {
+    return is_null(xs) ? list(x)
+            : cmp(x, head(xs)) 
+            ? pair(x, xs)
+            : pair(head(xs), insert_cmp(x, tail(xs), cmp));
+}
+
+// Insertion_sort_cmp Functions
+insertion_sort_cmp(list(6, 3, 8, 5, 1), (x,y) => x <= y); // 1 3 5 6 8
+insertion_sort_cmp(list(6, 3, 8, 5, 1), (x,y) => x >= y); // 8 6 5 3 1
+insertion_sort_cmp(list(6, 3, 8, 5, 1), (x,y) => false);  // 1 5 8 3 6
+
+
 // Selection Sort: Recursive
+// 2s | 13 | 26 | 40 | 8      [2, ..]
+//      13 | 26 | 40 | 8s     [2, 8, ..]
+//      13s| 26 | 40          [2, 8, 13, ..]
+//           26s| 40          [2, 8, 13, 26, ..]
+//                40s         [2, 8, 13, 26, 40]
 function selection_sort(xs) {
     if (is_null(xs)) {
         return xs;
@@ -283,6 +339,13 @@ function smallest(xs) {
 }
 
 // Merge Sort: Recursive
+//  13 | 2   |   26 | 40 | 8
+// [13 | 2]     [26    |  40 | 8]     
+// [13] c [2]   [26]     [40 | 8]
+// [2 | 13]     [26]     [40] c [8]
+// [2 | 13]     [26]  c  [8 | 40]
+// [2 | 13]  c  [8 | 26 | 40]
+// 2 | 8 | 13 | 26 | 40
 function merge_sort(xs) {
     if (is_null(xs)) {
         return xs;
@@ -316,3 +379,165 @@ function drop(xs, n) {
            ? xs
            : drop(tail(xs), n - 1);
 }
+
+// Comparing Normal and Destructive Functions
+
+// Normal Append
+// Create new pairs in xs and reuse pairs in ys
+function append(xs, ys) {
+    return is_null(xs)
+           ? ys
+           : pair(head(xs), append(tail(xs), ys));
+}
+
+// Destructive Append: Recursive
+// Change the original values of xs and ys
+function d_append(xs, ys) {
+    if (is_null(xs)) {
+        return ys;
+    } else {
+        const wish = d_append(tail(xs), ys);
+        set_tail(xs, wish);
+        return xs;
+    }
+}
+
+const a = list(1, 3, 5);
+const b = list(2, 4);
+const c = append(a, b); // creates 3 new pairs and reuses b. a and b are still the same
+const d = d_append(a, b); // no new pairs created. a is now the same as d. b is still the same
+
+// Recursive Reverse Time Θ(n^2)  Space Θ(n^2)
+function reverse(xs) {
+    return is_null(xs)
+            ? null
+            : append(reverse(tail(xs)), list(head(xs)));
+}
+
+// Destructive Reverse
+function d_reverse(xs) {
+    if (is_null(xs) || is_null(tail(xs))) {
+        return xs;
+    } else {
+        const wish = d_reverse(tail(xs));
+        set_
+    }
+}
+// Normal Map
+function map(f, xs) {
+    return is_null(xs)
+           ? xs
+           : pair(f(head(xs)), map(f, tail(xs)));
+}
+
+// Destructive Map: No Return
+function d_map(f, xs) {
+    if (!is_null(xs)) {
+        set_head(xs, head(xs));
+        d_map(f, tail(xs));
+    }
+}
+
+// Destructive Map: With Return
+function d_map(f, xs) {
+    if (is_null(xs)) {
+        return xs;
+    } else {
+        const wish = d_map(f, tail(xs));
+        set_head(xs, f(head(xs)));
+        set_tail(xs, wish);
+        return xs;
+    }
+}
+
+// Normal filter
+function filter(pred, xs) {
+    return is_null(xs)
+           ? xs
+           : pred(head(xs))
+           ? pair(head(xs), filter(pred, tail(xs)))
+           : filter(pred, tail(xs));
+}
+
+// Destructive Filter: With Return
+function d_filter(pred, xs) {
+    if (is_null(xs)) {
+        return xs;
+    } else {
+        const wish = d_filter(pred, tail(xs));
+        if (pred(head(xs))) {
+            set_tail(xs, wish);
+            return xs;
+        } else {
+            return wish;
+        }
+    }
+}
+
+// Normal Accumulate
+function accumulate(op, initial, xs) {
+    return is_null(xs)
+            ? initial
+            : op(head(xs), accumulate(op, initial, tail(xs)));
+}
+
+// Array Functions
+array_length([1, 2, 3]); // Return 3
+
+// Destructive Array Mapping
+function map_array(f, arr) {
+    const len = array_length(arr);
+    for (let i=0; i<len; i=i+1) {
+        arr[i] = f(arr[i]);
+    }
+}
+
+// New-Copy Array Mapping
+function map_array(f, arr) {
+    const new_arr = [];
+    const len = array_length(arr);
+    for (let i=0; i<len; i=i+1) {
+        new_arr[i] = f(arr[i]);
+    }
+}
+
+// List Length
+function list_length(xs) {
+    let count = 0;
+    for (let p=xs; !is_null(p); p=tail(p)) {
+        count = count + 1;
+    }
+    return count;
+}
+
+// break and continue
+// break_cont(list("John", "2", "Mary", "1", "Peter")) displays 
+// "Hi John" --> "Hi Mary"
+function break_cont(xs) {       
+    while (is_null(xs)) {
+        if (head(xs) === "1") {
+            break; // Ends the whole while loop
+        } else if (head(xs) === "2") {
+            continue;
+        }
+        display("Hi " + head(xs));
+        xs = tail(xs);
+    }
+}
+
+// Reverse Array
+function reverse_array(A) {
+    const len = array_length(A);
+    const half_len = math_floor(len/2);
+    for (let i=0; i<half_len; i=i+1) {
+        swap(A, i, len-1-i);
+    }
+}
+
+function swap(A, i, j) { // MUST pass in array A
+    const temp = A[i];
+    A[i] = A[j];
+    A[j] = temp;
+}
+
+// Destructive Reverse List
