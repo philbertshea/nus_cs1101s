@@ -1,6 +1,8 @@
-const HEIGHT = 19;
-const WIDTH = 19;
 // Copy your function red_rectangle_stream from TASK 1 here.
+// TASK 2
+
+// Copy your function red_rectangle_stream from TASK 1 here.
+import {install_filter, set_dimensions, keep_aspect_ratio, set_fps, start, image_width, image_height} from "pix_n_flix";
 
 function red_rectangle_stream(s) {
     // your solution goes here
@@ -11,8 +13,6 @@ function red_rectangle_stream(s) {
         let right_j = 0;
         for (let i=0; i<HEIGHT; i=i+1) {
             for (let j=0; j<WIDTH; j=j+1) {
-                display(i, "i");
-                display(j, "j");
                 if (img[i][j][0] === 255 && img[i][j][1] === 0 && img[i][j][2] === 0) {
                     left_i = i < left_i ? i : left_i;
                     left_j = j < left_j ? j : left_j;
@@ -55,6 +55,8 @@ function trim(image, rectangle) {
     return trimmed;
 }
 
+// Example:
+/*
 function find_shield(s) {
     const now = display(head(s));
     check_colour(now);
@@ -87,7 +89,9 @@ function check_colour(A) {
         }
     }
 }
-/*
+
+
+
 function check_diff(A, B) {
     for (let i=0; i<19; i=i+1) {
         for (let j=0; j<19; j=j+1) {
@@ -102,19 +106,75 @@ function check_diff(A, B) {
 }
 */
 
-function zoom(src, factor) {
-    let dest = [];
-    const width = display(array_length(src[0]));
-    const height = display(array_length(src));
-    const ends = [height/2 - height/factor/2, width/2 - width/factor/2]; // starting points for top left
 
+
+const FPS = 15;
+function make_image(width, height) {
+    const img = [];
     for (let i = 0; i < height; i = i + 1) {
+        const row = [];
+        img[i] = row;
         for (let j = 0; j < width; j = j + 1) {
-            const a = math_floor(ends[0] + (i/factor));
-            const b = math_floor(ends[1] + (j/factor));
-            if (dest[i] === undefined) {
-                dest[i] = [];
+            const pixel = [];
+            row[j] = pixel;
+            for (let z = 0; z < 4; z = z + 1) {
+                pixel[z] = 255;
             }
+        }
+    }
+    return img;
+}
+
+function stream_to_filter(s) {
+    // your solution goes here
+    
+    function filter(src, dest) {
+        const img = head(s);
+        for (let i = 0; i < HEIGHT; i = i + 1) {
+            for (let j = 0; j < WIDTH; j = j + 1) {
+                dest[i][j][0] = img[i][j][0];
+                dest[i][j][1] = img[i][j][1];
+                dest[i][j][2] = img[i][j][2];
+                dest[i][j][3] = img[i][j][3];
+            }
+        }
+        if (!is_null(stream_tail(s))) {
+            s = stream_tail(s);
+        }
+    }
+    return filter;
+}
+
+
+function zoom(factor) {
+    function filter(src) {
+        // your solution here
+        const width = 19;
+        const height = 19;
+        const ends = [height/2 - height/factor/2, width/2 - width/factor/2]; // starting points for top left
+        let dest = [];
+        
+        for (let i = 0; i < height; i = i + 1) {
+            for (let j = 0; j < width; j = j + 1) {
+                const a = math_floor(ends[0] + (i/factor));
+                const b = math_floor(ends[1] + (j/factor));
+                if (dest[i] === undefined) {
+                    dest[i] = [];
+                }
+                dest[i][j] = src[a][b];
+            }
+        }
+        return dest;
+    }
+    return filter;
+}
+
+function scale_up(src) {
+    let dest = make_image(HEIGHT, WIDTH);
+    for (let i=0; i<HEIGHT; i=i+1) {
+        for (let j=0; j<WIDTH; j=j+1) {
+            const a = math_floor(i/HEIGHT*19);
+            const b = math_floor(j/WIDTH*19);
             dest[i][j] = src[a][b];
         }
     }
@@ -122,47 +182,44 @@ function zoom(src, factor) {
 }
 
 
-// Example:
-const zoomed_stream = anomaly_stream;
-display(stream_tail(zoomed_stream));
-
 const focused_stream = stream_combine(
                            trim,
-                           zoomed_stream,
-                           red_rectangle_stream(zoomed_stream));
+                           anomaly_stream,
+                           red_rectangle_stream(anomaly_stream));
 
+const zoomed_stream = stream_map((image) => zoom(2)(image), focused_stream);
+const scaled_stream = stream_map((image) => scale_up(image), zoomed_stream);
+//display(scaled_stream);
+// find_shield(focused_stream);
 
+install_filter(stream_to_filter(scaled_stream));
+
+//install_filter(zoom(2)); 
+set_dimensions(WIDTH, HEIGHT);
+keep_aspect_ratio(true);
+set_fps(FPS);
+start();
+// Example:=
 
 // Should return a close-up of the anomaly, a 19x19 image of black,
 // red and white pixels.
 
 /*
 Q1: What color it might absorb?
-ANS: (write your answer here)
+ANS: The shield likely Absorbs BLUE.
 
 
 Q2: What color of laser beam would you use?
-ANS: (write your answer here)
+ANS: Use a BLUE laser.
 
 
 Q3: Which part of the shield would you target?
-ANS: (write your answer here)
+ANS: Target the CENTRE of the shield. 
 
 
 Q4: How did you find the answer?
-ANS: (answer in at most three sentences how
-      you found the color and the target)
-
-When running the code above, different runs give fluctuating values of mem:
-[[18, 3, [246, 246, 246, 255]]]
-[[0, 4, [120, 120, 120, 255]]]
-[[1, 2, [121, 121, 121, 255]]]
-[[17, 3, [192, 192, 192, 255]]]
-[[0, 14, [87, 87, 87, 255]], [17, 1, [167, 167, 167, 255]]]
-[[0, 16, [160, 160, 160, 255]]]
-[[18, 0, [112, 112, 112, 255]]]
-[ [0, 18, [158, 158, 158, 255]],
-  [16, 18, [64, 64, 64, 255]],
-  [18, 2, [116, 116, 116, 255]]]
+ANS: At first, I used find_colour and find_shield functions to identify the colours in the 19*19 pixel. However, it only showed occasional gray spots
+These gray spots seem to be the stars and are irrelevant to the search for the shield. I then used stream_to_filter, make_image, zoom and scale_up functions to zoom into the centre (white) shield and scale up to 400*300.
+Using filters to visualise, I can see fluctuating yellow spots at the CENTRE of the white shield. Hence the shield reflects yellow (red+green) and absorbs its complement, blue. Shoot blue.
   
 */
