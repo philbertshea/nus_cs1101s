@@ -690,7 +690,7 @@ function insertion_sort(A) {
             A[j+1] = A[j];          // Copy value of j element to j+1 element
             j = j - 1;              // Decrement j by 1: Search for the left element
         }
-        A[j+1]=x;
+        A[j+1] = x;
     }
 }
 
@@ -701,7 +701,7 @@ function merge_sort(A) {
     merge_sort_helper(A, 0, array_length(A) - 1);
 }
 function merge_sort_helper(A, low, high) {
-    if (low<high) {
+    if (low < high) {
         const mid = math_floor((low + high)/2);
         merge_sort_helper(A, low, mid);
         merge_sort_helper(A, mid + 1, high);
@@ -745,7 +745,7 @@ function merge(A, low, mid, high) {
 }
 
 // Memoised Fibonacci
-const mem = [];
+const mem = []; 
 function mfib(n) {
     if (mem[n] !== undefined) { // If mem[n] stored, return it directly
         return mem[n];
@@ -764,16 +764,50 @@ function memoize(f) {
         if (mem[x] !== undefined) {
             return mem[x];
         } else {
-            const result = f(x); // If not applied carefully, this will call the non-memoised version
+            const result = f(x);
             mem[x] = result;
             return result;
         }
     }
     return mf;
 }
+
+// Argument passed to memoize involves call to mfib itself
 const mfib = memoize(n => n<=1 ? n
                                : mfib(n-1) + mfib(n-2));
-                               
+                              
+// Return nCk                              
+function choose(n, k) {
+    return k >= n ? 0
+            : k === 0 || k === n ? 1
+            : choose(n-1, k) + choose(n-1, k-1);
+}
+
+// Memoized n choose k: Use of read and write
+const mem = [];
+function read(n, k) {
+    return mem[n] === undefined
+            ? undefined
+            : mem[n][k];
+}
+function write(n, k, value) {
+    if (mem[n] === undefined) {
+        mem[n] = [];
+    }
+    mem[n][k] = value;
+}
+function mchoose(n, k) {        // Time and Space theta((n-k)k) O(nk)
+    if (read(n, k) !== undefined) {
+        return read(n, k);
+    } else {
+        const result = k >= n ? 0
+                        : k === 0 || k === n ? 1
+                        : mchoose(n-1, k) + mchoose(n-1, k-1);
+        write(n, k, result);
+        return result;
+    }
+}
+
 // Copy Array before doing Sort, if Qn says do not change original A
 function copy(A) {
     for (let i=0; i<array_length(A); i=i+1) {
@@ -782,4 +816,181 @@ function copy(A) {
     return B;
 }
 
-                             
+// Efficient Searching (NO Altering of A)
+function make_search(A) {
+    const B = copy(A);                  // n time
+    merge_sort(B);                      // n log n time
+    return x => binary_search(B, x);    // k * log n time, k is no. of times search is called
+}
+
+
+// Streams
+// A stream is EITHER an empty list (null) OR a pair whose tail is a nullary function that returns a stream
+
+const s1 = null;
+const s2 = pair(1, () => null);
+const s3 = pair(1, () => pair(-1, () => s3)); // infinite stream, alternating ones
+
+function stream_tail(s) {
+    // Calls the tail and returns the stream given by the nullary function
+    return tail(s)();
+}
+
+function stream_ref(s, n) {     // Θ(n) Get nth element
+    return n === 0 ? head(s)
+                    : stream_ref(stream_tail(s), n-1);
+}
+
+function stream_map(f, s) {     // Θ(1) Apply f to each element
+    return is_null(s) ? null
+            : pair(f(head(s)), 
+                    () => stream_map(f, stream_tail(s)));
+}
+
+function stream_filter(p, s) {  // Θ(n) Apply filter p on elements
+    return is_null(s) ? null
+            : p(head(s))
+            ? pair(head(s), () => stream_filter(p, stream_tail(s)))
+            : stream_filter(p, stream_tail(s));
+}
+
+function eval_stream(s, n) {    // Θ(n) Print n elements in a list
+    return n === 0 ? null
+            : pair(head(s), eval_stream(stream_tail(s), n - 1));
+}
+
+function enum_stream(low, hi) {     // [low, [low+1, ... [hi, null]]]
+    return low > hi ? null
+            : pair(low, 
+                    () => enum_stream(low + 1, hi));
+}
+
+function integers_from(n) {         // [n, [n+1, ... inf]]
+    return pair(n, () => integers_from(n+1));
+}
+
+// No Fours Application
+const pos_int = integers_from(1);
+const no_fours = stream_filter(x => x % 4 !== 0, pos_int); // [1, 2, 3, 5, 6, 7, 9 ...]
+const y = stream_map(x => x * 10, no_fours);    // [10, 20, 30, 50, ...]
+stream_ref(no_fours, 3); // Return 5
+eval_stream(y, 5); // Return list(10, 20, 30, 50, 60)
+
+// Fibonacci Numbers with Streams
+function fib_gen(a, b) {
+    return pair(a, () => fib_gen(b, a + b));
+}
+const fibs = fib_gen(0, 1); // 0, 1, 1, 2, 3, 5, ... 
+
+// More and More: 1, 1, 2, 1, 2, 3, ...
+function more(a, b) {   // a is current, b is target
+    return a > b ? more(1, 1 + b)
+            : pair(a, () => more(a + 1, b));
+}
+
+const more_and_more = more(1, 1); // 1, 1, 2, 1, 2, 3, ...
+
+
+// More Streams Functions
+function add_streams(s1, s2) {  // Add ith element of s1 to ith element of s2
+    return is_null(s1) ? s2
+            : is_null(s2) ? s1
+            : pair(head(s1) + head(s2),
+                    () => add_streams(stream_tail(s1),
+                                      stream_tail(s2)));
+}
+
+function mul_streams(s1, s2) { // Multiply ith element of s1 by ith element of s2
+    return is_null(s1) ? s2
+            : is_null(s2) ? s1
+            : pair(head(s1) * head(s2),
+                    () => mul_streams(stream_tail(s1),
+                                      stream_tail(s2)));
+}
+
+function scale_stream(s, f) {  // Multiply each element by f
+    return stream_map(x => x * f, s);
+}
+
+function replace(s, a, b) {     // Replace all instances of a with b
+    return is_null(s) ? null
+            : pair((head(s) === a) ? b : head(s),
+                () => replace(stream_tail(s), a, b));
+}
+
+function list_to_inf_stream(xs) { // Convert list to infinite stream
+    function helper(ys) {
+        return is_null(ys) 
+                ? helper(xs)
+                : pair(head(ys), () => helper(tail(ys)));
+    }
+    return is_null(xs) ? null : helper(xs);
+}
+
+// MEMOISATION FOR STREAMS
+function memo_fun(fun) {
+    let already_run = false;
+    let result = undefined;
+    function mfun() {
+        if (!already_run) {
+            result = fun();
+            already_run = true;
+            return result;
+        } else {
+            return result;
+        }
+    }
+    return mfun;
+}
+
+// Memoized ms displays only ONCE
+function ms(m, s) {
+    display(m);
+    return s;
+}
+const onesA = pair(1, () => ms("A", onesA));
+const onesB = pair(1, memo_fun(() => ms("B", onesB)));
+stream_ref(onesA, 3); // "A" "A" "A"
+stream_ref(onesB, 3); // "B"
+
+
+function m_integers_from(n) {
+    return pair(n, memo_fun(() => ms("M: " + stringify(n), 
+                                        m_integers_from(n+1))));
+}
+const m_integers = m_integers_from(1);
+stream_ref(m_integers, 3);  // "M: 1" "M: 2" "M: 3"
+stream_ref(m_integers, 5);  // "M: 4" "M: 5"
+
+// Stream of Primes
+const primes = pair(2, () => stream_filter(is_prime, int_from(3)));
+
+// After printing each element starting from 2, 
+// Filter away the multiples of the printed element in the remaining items
+// This also removes the element itself, hence the sieve behind starts with another prime
+function sieve(s) {
+    return pair(head(s), 
+                () => sieve(stream_filter(
+                            x => x % head(s) !== 0, stream_tail(s))));
+}
+
+// Square Roots by Newton's Method
+function improve(guess, x) {
+    return average(guess, x/guess);
+}
+function good_enough(guess, x) {
+    return math_abs(guess - x) < 0.01;
+}
+function sqrt_iter(guess, x) {
+    if (good_enough(guess, x)) {
+        return guess;
+    } else {
+        return sqrt_iter(improve(guess, x), x)
+    }
+}
+function sqrt(x) {
+    return sqrt_iter(1.0, x);
+}
+
+// Using Streams for iteration
+func
