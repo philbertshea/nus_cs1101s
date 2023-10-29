@@ -992,5 +992,39 @@ function sqrt(x) {
     return sqrt_iter(1.0, x);
 }
 
-// Using Streams for iteration
-func
+// Use Streams for Iteration
+function sqrt_stream(x) {
+    // Assign to some Constant, and call it Within itself.
+    // ACTS ON ITSELF!
+    const p = pair(1.0, () => stream_map(guess => improve(guess, x), p));
+    return p;
+}
+eval_stream(sqrt_stream(2), 6);
+
+// Approximate PI
+function pi_summands(n) {
+    return pair(1/n, () => stream_map(x => -x, pi_summands(n+2)));
+}
+const pi_stream = scale_stream(partial_sums(pi_summands(1)), 4);
+
+// Partial Sums: s0, s0+s1, s0+s1+s2, ...
+// E.g. partial_sums(1, 2, 3, 4...) gives 1, 3, 6, 10...
+function partial_sums(s) {
+    function helper(s, acc) {
+        acc = acc + head(s);
+        return pair(acc, () => helper(stream_tail(s), acc));
+    }
+    return helper(s, 0);
+}
+function partial_sums_2(s) {
+    return pair(head(s), () => stream_map(x => x + head(s), 
+                                            partial_sums(stream_tail(s))));
+}
+function partial_sums_3(s) {
+    return add_streams(s, pair(0, () => partial_sums_3(s)));
+}
+
+// Zip List of Streams
+function zip_list_of_streams(s) {
+    return pair();
+}
