@@ -1024,6 +1024,79 @@ function partial_sums_3(s) {
     return add_streams(s, pair(0, () => partial_sums_3(s)));
 }
 
+// Prompt Stream
+function make_prompt_stream() {
+    return pair(prompt("Enter next stream element: "), make_prompt_stream);
+}
+const prompt_stream = make_prompt_stream();
+
+// N of N Stream: 1, 2, 2, 3, 3, 3, 4, 4, 4, 4...
+function n_of_n_stream() {
+    function helper(n, count) {
+        return count >= n  
+                ? pair(n+1, () => helper(n+1, 1))
+                : pair(n, () => helper(n, count+1));
+    }
+    return helper(1, 0);
+}
+
+// Shorten Stream: shorten(integers, 3) --> 1, 2, 3
+function shorten_stream(s, k) {
+    if (is_null(s) || k === 0) {
+        return null;
+    } else {
+        return pair(head(s), () => shorten_stream(stream_tail(s), k-1));
+    }
+}
+
+// Alternate Count: Every kth element
+function every_k(s, k) {
+    function helper(count, ys) {
+        return count % k === 0
+                ? pair(head(ys), () => helper(count + 1, stream_tail(ys)))
+                : helper(count + 1, stream_tail(ys));
+    }
+    return helper(0, s);
+}
+
+// Array to Stream: [1, 2, 3] to stream 1, 2, 3
+function array_to_stream(a) {
+    const len = array_length(a);
+    function helper(count) {
+        return count === len
+               ? null
+               : pair(a[count], () => helper(count + 1));
+    }
+    return helper(0);
+}
+
+// Loop Stream
+function loop(s) {
+    // your solution goes here
+    function helper(xs) {
+        return is_null(stream_tail(xs)) 
+                ? pair(head(xs), () => helper(s))
+                : pair(head(xs), () => helper(stream_tail(xs)));
+    }
+    return helper(s);
+}
+
+// Stream Combine: Applies f(x, y) onto every element of s1 and s2
+function stream_combine(f, s1, s2) {
+    // your solution goes here
+    return pair(f(head(s1), head(s2)), 
+                () => stream_combine(f, stream_tail(s1), stream_tail(s2)));
+}
+// Zip Two Streams
+function zip_streams(s1, s2) {
+    function helper(xs, ys, gets1) {
+        return gets1
+                ? pair(head(xs), () => helper(stream_tail(xs), ys, !gets1))
+                : pair(head(ys), () => helper(xs, stream_tail(ys), !gets1));
+    }
+    return helper(s1, s2, true);
+}
+
 // Zip List of Streams
 function zip_list_of_streams(s) {
     return pair();
