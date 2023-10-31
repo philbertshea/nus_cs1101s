@@ -78,5 +78,8 @@ function stpairs_3(s) {
     }
     return helper(s, stream_tail(s), 1, 0);
 }
+
+function 
 const ints = stream_map(x => 2*x, integers_from(1));
-eval_stream(stpairs_3(ints), 20);
+eval_stream(stpairs_3(ints), 100);
+display(paircount);
