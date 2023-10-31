@@ -37,3 +37,46 @@ function f(x) {
 const alt_ones4 = stream_map(f, ones);
 
 eval_stream(alt_ones4, 5);
+
+
+// In Class
+
+function stream_pairs(s) {
+    return is_null(s)
+            ? null
+            : stream_append(
+                stream_map(
+                    sn => pair(head(s), sn),
+                    stream_tail(s)),
+                stream_pairs(stream_tail(s)));
+}
+
+
+function stream_append_pickle(xs, ys) {
+    return is_null(xs)
+            ? ys()
+            : pair(head(xs),
+                    () => stream_append_pickle(stream_tail(xs),
+                                                ys));
+}
+function stream_pairs2(s) {
+    return is_null(s)
+            ? null
+            : stream_append_pickle(
+                stream_map(
+                    sn => pair(head(s), sn),
+                    stream_tail(s)),
+                () => stream_pairs2(stream_tail(s)));
+}
+
+function stpairs_3(s) {
+    function helper(nows, nexts, goal, count) {
+        return count === goal
+                ? helper(s, stream_tail(nexts), goal + 1, 0)
+                : pair(pair(head(nows), head(nexts)),
+                        () => helper(stream_tail(nows), nexts, goal, count + 1));
+    }
+    return helper(s, stream_tail(s), 1, 0);
+}
+const ints = stream_map(x => 2*x, integers_from(1));
+eval_stream(stpairs_3(ints), 20);
