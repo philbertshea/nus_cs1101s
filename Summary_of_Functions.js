@@ -847,6 +847,11 @@ function stream_map(f, s) {     // Θ(1) Apply f to each element
                     () => stream_map(f, stream_tail(s)));
 }
 
+function stream_map_opt(f, s) { // Memoized Stream Map
+    return is_null(s) ? null
+            : pair(f(head(s)), 
+                    memo_fun(() => stream_map_opt(f, stream_tail(s))));
+}
 function stream_filter(p, s) {  // Θ(n) Apply filter p on elements
     return is_null(s) ? null
             : p(head(s))
@@ -895,16 +900,8 @@ const more_and_more = more(1, 1); // 1, 1, 2, 1, 2, 3, ...
 function add_streams(s1, s2) {  // Add ith element of s1 to ith element of s2
     return is_null(s1) ? s2
             : is_null(s2) ? s1
-            : pair(head(s1) + head(s2),
+            : pair(head(s1) + head(s2),     // Mulstream: head(s1) * head(s2)
                     () => add_streams(stream_tail(s1),
-                                      stream_tail(s2)));
-}
-
-function mul_streams(s1, s2) { // Multiply ith element of s1 by ith element of s2
-    return is_null(s1) ? s2
-            : is_null(s2) ? s1
-            : pair(head(s1) * head(s2),
-                    () => mul_streams(stream_tail(s1),
                                       stream_tail(s2)));
 }
 
@@ -962,9 +959,6 @@ const m_integers = m_integers_from(1);
 stream_ref(m_integers, 3);  // "M: 1" "M: 2" "M: 3"
 stream_ref(m_integers, 5);  // "M: 4" "M: 5"
 
-// Stream of Primes
-const primes = pair(2, () => stream_filter(is_prime, int_from(3)));
-
 // After printing each element starting from 2, 
 // Filter away the multiples of the printed element in the remaining items
 // This also removes the element itself, hence the sieve behind starts with another prime
@@ -972,24 +966,6 @@ function sieve(s) {
     return pair(head(s), 
                 () => sieve(stream_filter(
                             x => x % head(s) !== 0, stream_tail(s))));
-}
-
-// Square Roots by Newton's Method
-function improve(guess, x) {
-    return average(guess, x/guess);
-}
-function good_enough(guess, x) {
-    return math_abs(guess - x) < 0.01;
-}
-function sqrt_iter(guess, x) {
-    if (good_enough(guess, x)) {
-        return guess;
-    } else {
-        return sqrt_iter(improve(guess, x), x)
-    }
-}
-function sqrt(x) {
-    return sqrt_iter(1.0, x);
 }
 
 // Use Streams for Iteration
@@ -1070,7 +1046,7 @@ function array_to_stream(a) {
     return helper(0);
 }
 
-// Loop Stream
+// Loop Stream: 1, 2, 3 --> 1, 2, 3, 1, 2, 3, inf
 function loop(s) {
     // your solution goes here
     function helper(xs) {
@@ -1097,7 +1073,8 @@ function zip_streams(s1, s2) {
     return helper(s1, s2, true);
 }
 
-// Zip List of Streams
-function zip_list_of_streams(s) {
-    return pair();
+// Zip List of Streams: Wishful Thinking
+function zip_list_of_streams(ss) {  // ss is list(s1, s2, s3...)
+    return pair(head(head(ss)),
+                () => zip_list_of_streams(append(tail(ss), list(head(ss))))); // Shift first list behind
 }
