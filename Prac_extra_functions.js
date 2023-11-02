@@ -13,7 +13,7 @@ function expand_matrix(M, k) {
 }
 expand_matrix(list(list(1, 2, 3), list(4, 5, 6)), 3);
 
-function unique(xs) {
+function unique(xs) {   // list(1, 1, 2, 2, 3) --> list(1, 2, 3)
     // Recursive
     if (is_null(xs) || is_null(tail(xs))) {
         return xs;
@@ -47,7 +47,7 @@ function accumulate_tree(f1, f2, initial, tree) {
 
 // Matrices: list(list(1, 2, 3), list(4, 5, 6), list(7, 8, 9))
 function get_elem(M, r, c) {
-    
+    return list_ref(list_ref(M, r), c);
 }
 
 // Array to list
@@ -83,7 +83,7 @@ function apply(p, xs) {
 }
 
 // Last Comes First (Circular Right Shift)
-function last_comes_first(xs) {
+function last_comes_first(xs) { // list(5, 4, 3, 2) --> list(2, 5, 4, 3)
     if (is_null(tail(xs))) {
         return xs;
     } else {
@@ -92,7 +92,7 @@ function last_comes_first(xs) {
     }
 }
 
-function first_comes_last(xs) {
+function first_comes_last(xs) { // list(5, 4, 3, 2) --> list(4, 3, 2, 5)
     if (is_null(xs)) {
         return xs;
     } else {
