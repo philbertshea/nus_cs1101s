@@ -22,23 +22,28 @@ function evaluate(program) {
         display_stash(S);   
         display_environment(E);
         const command = head(C);
+        display_command(command);
         C = tail(C);
         
         // expressions and statements
         if (is_literal(command)) {
+            display("Is Literal");
             S = pair(literal_value(command), S);
         } else if (is_binary_operator_combination(command)) {
+            display("Is Bin Op Combination");
             C = pair(first_operand(command),
                  pair(second_operand(command),
                   pair(make_binary_operator_instruction(
                    operator_symbol(command)),
                    C)));
         } else if (is_unary_operator_combination(command)) {
+            display("Is Un Op Combination");
             C = pair(first_operand(command),
                   pair(make_unary_operator_instruction(
                    operator_symbol(command)),
                    C));
         } else if (is_sequence(command)) {
+            display("Is Sequence");
             const body = sequence_statements(command);
             C = is_null(body)
                 ? pair(make_literal(undefined), C)
@@ -49,12 +54,14 @@ function evaluate(program) {
                       pair(make_sequence(tail(body)),
                         C)));
         } else if (is_conditional(command)) {
+            display("Is Conditional");
             C = pair(conditional_predicate(command),
                   pair(make_branch_instruction(
                          conditional_consequent(command),
                          conditional_alternative(command)),
                     C));
         } else if (is_block(command)) {
+            display("Is Block");
             const locals = scan_out_declarations(
                              block_body(command));
             const unassigneds = list_of_unassigned(locals);
@@ -63,24 +70,29 @@ function evaluate(program) {
                     C));
             E = extend_environment(locals, unassigneds, E);
         } else if (is_function_declaration(command)) {
+            display("Is Function Declaration");
             C = pair(function_decl_to_constant_decl(command),
                      C);
         } else if (is_declaration(command)) {
+            display("Is Declaration");
             C = pair(make_assignment(
                        declaration_symbol(command),
                        declaration_value_expression(command)),
                      C);
         } else if (is_name(command)) {
+            display("Is Name");
             S = pair(lookup_symbol_value(
                          symbol_of_name(command),
                          E),
                      S);
         } else if (is_assignment(command)) {
+            display("Is Assignment");
             C = pair(assignment_value_expression(command),
                   pair(make_assign_instruction(
                          assignment_symbol(command)),
                        C));
         } else if (is_lambda_expression(command)) {
+            display("Is Lambda Expression");
             if (is_return_statement(
                    lambda_body(command))) {
                 S = pair(make_simple_function(
@@ -92,6 +104,7 @@ function evaluate(program) {
                 error(command, "body must be return statement");
             }
         } else if (is_application(command)) {
+            display("Is Application");
             const arg_exprs = arg_expressions(command);
             C = pair(function_expression(command),
                   append(arg_exprs, 
@@ -100,29 +113,36 @@ function evaluate(program) {
                            
         // machine instructions
         } else if (is_pop_instruction(command)) {
+            display("Is Pop Instruction");
             S = tail(S);
         } else if (is_binary_operator_instruction(command)) {
+            display("Is Bin Op Instruction");
             S = pair(apply_binary(operator_instruction_symbol(command),
                                   head(tail(S)), head(S)),
                  tail(tail(S)));
         } else if (is_unary_operator_instruction(command)) {
+            display("Is Un Op Instruction");
             S = pair(apply_unary(operator_instruction_symbol(command),
                        head(S)),
                  tail(S));
         } else if (is_branch_instruction(command)) {
+            display("Is Branch Instruction");
             C = pair(is_truthy(head(S))
                      ? branch_instruction_consequent(command)
                      : branch_instruction_alternative(command),
                      C);
             S = tail(S);
         } else if (is_assign_instruction(command)) {
+            display("Is Asgn Instruction");
             assign_symbol_value(
                assign_instruction_symbol(command), 
                head(S),
                E);
         } else if (is_env_instruction(command)) {
+            display("Is Env Instruction");
             E = env_instruction_environment(command);
         } else if (is_call_instruction(command)) {
+            display("Is Call Instruction");
             const arity = call_instruction_arity(command);
             let args = null;
             let n = arity;
@@ -134,9 +154,11 @@ function evaluate(program) {
             const fun = head(S);
             S = tail(S);
             if (is_primitive_function(fun)) {
+                display("--> Is Primitive Function");
                 S = pair(apply_primitive_function(fun, args),
                       S);
             } else if (is_simple_function(fun)) {
+                display("--> Is Simple Function");
                 C = pair(function_body(fun), 
                       pair(make_env_instruction(E),
                         C));
@@ -158,6 +180,7 @@ function evaluate(program) {
 // (SICP JS 4.1.1)
 
 function scan_out_declarations(component) {
+    display("Run Scan_out_declarations");
     return is_sequence(component)
            ? accumulate(append,
                         null,
@@ -169,10 +192,12 @@ function scan_out_declarations(component) {
 }
 
 function list_of_unassigned(symbols) {
+    display("Create list_of_unassigned");
     return map(symbol => "*unassigned*", symbols);
 }
 
 function apply_binary(operator, op1, op2) {
+    display("Run apply_binary");
     return operator === "+"
            ? op1 + op2
            : operator === "-"
@@ -674,8 +699,22 @@ function display_environment(E) {
     display("", "                                             ");
 }
 
+function display_command(command) {
+    display("", "***   Command  ***                      ");
+    display_list(command);
+    display("", "                                             ");
+}
+
+function display_parsed(command) {
+    display("", "***   Parsed Initial  ***                      ");
+    display_list(command);
+    display("", "                                             ");
+}
+
 function parse_and_evaluate(string) {
-    return evaluate(parse(string));
+    const parsed = parse(string);
+    display_parsed(parsed);
+    return evaluate(parsed);
 }
 
 //parse_and_evaluate("1;");
@@ -706,15 +745,15 @@ function parse_and_evaluate(string) {
 
 //parse_and_evaluate("math_pow(2, 3);");
 
-/*
+
 parse_and_evaluate(`
 function factorial(n) {
     return n === 1
            ? 1
-           : n * factorial(n - 1);
+           : n * n-1;
 }
 factorial(5);`);
-*/
+
 
 /*
 parse_and_evaluate(`
