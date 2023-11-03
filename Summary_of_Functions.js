@@ -744,6 +744,19 @@ function merge(A, low, mid, high) {
     }
 }
 
+function bubblesort_array(A) {
+    const len = array_length(A);
+    for (let i=len - 1; i >= 1; i = i - 1) {
+        for (let j=0; j<i; j=j+1) {
+            if (A[j] > A[j+1]) {
+                const temp = A[j];
+                A[j] = A[j+1];
+                A[j+1] = temp;
+            }
+        }
+    }
+}
+ 
 // Memoised Fibonacci
 const mem = []; 
 function mfib(n) {
@@ -858,7 +871,11 @@ function stream_filter(p, s) {  // Θ(n) Apply filter p on elements
             ? pair(head(s), () => stream_filter(p, stream_tail(s)))
             : stream_filter(p, stream_tail(s));
 }
-
+function stream_append(xs, ys) {
+    return is_null(xs)
+            ? ys
+            : pair(head(xs), () => stream_append(stream_tail(xs), ys));
+}
 function eval_stream(s, n) {    // Θ(n) Print n elements in a list
     return n === 0 ? null
             : pair(head(s), eval_stream(stream_tail(s), n - 1));
