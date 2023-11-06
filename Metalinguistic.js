@@ -224,6 +224,7 @@ function apply_binary(operator, op1, op2) {
 }
 
 function apply_unary(operator, op) {
+    display("Run apply_unary");
     return operator === "-unary"
            ? - op
            : operator === "!"
@@ -247,6 +248,7 @@ function literal_value(component) {
     return head(tail(component));
 }
 function make_literal(val) {
+    display("Make Literal");
     return list("literal", val);
 }
 
@@ -256,6 +258,7 @@ function is_name(component) {
     return is_tagged_list(component, "name");
 }
 function make_name(symbol) {
+    display("Make Name");
     return list("name", symbol);
 }
 function symbol_of_name(component) {
@@ -321,6 +324,7 @@ function block_body(component) {
     return head(tail(component));
 }
 function make_block(statement) {
+    display("Make Block");
     return list("block", statement);
 }
 
@@ -338,6 +342,7 @@ function declaration_value_expression(component) {
     return head(tail(tail(component)));
 }
 function make_constant_declaration(name, value_expression) {
+    display("Make Const Declaration");
     return list("constant_declaration", name, value_expression);
 }
 
@@ -353,6 +358,7 @@ function assignment_value_expression(component) {
     return head(tail(tail(component)));
 }
 function make_assignment(symbol, expression) {
+    display("Make Assignment");
     return list("assignment", 
                 make_name(symbol),
                 expression);
@@ -371,6 +377,7 @@ function lambda_body(component) {
 }
 
 function make_lambda_expression(parameters, body) {
+    display("Make Lambda Expression");
     return list("lambda_expression", parameters, body);
 }
 
@@ -389,6 +396,7 @@ function function_declaration_body(component) {
     return list_ref(component, 3);
 }
 function function_decl_to_constant_decl(component) {
+    display("Function Decl to Constant Decl");
     return make_constant_declaration(
                function_declaration_name(component),
                make_lambda_expression(
@@ -433,9 +441,11 @@ function operator_instruction_symbol(component) {
     return list_ref(component, 1);
 }
 function make_binary_operator_instruction(symbol) {
+    display("Make Bin Op Instruction");
     return list("binop", symbol);
 }
 function make_unary_operator_instruction(symbol) {
+    display("Make Un Op Instruction");
     return list("unop", symbol);
 }
 
@@ -448,6 +458,7 @@ function assign_instruction_symbol(component) {
     return head(tail(component));
 }
 function make_assign_instruction(symbol) {
+    display("Make Assign Instruction");
     return list("asgn", symbol);
 }
 
@@ -457,6 +468,7 @@ function is_pop_instruction(component) {
     return is_tagged_list(component, "pop");
 }
 function make_pop_instruction() {
+    display("Make Pop Instruction");
     return list("pop");
 }
 
@@ -472,6 +484,7 @@ function branch_instruction_alternative(component) {
    return list_ref(component, 2);
 }
 function make_branch_instruction(consequent, alternative) {
+    display("Make Branch Instruction");
     return list("branch", consequent, alternative);
 }
 
@@ -484,6 +497,7 @@ function env_instruction_environment(component) {
    return list_ref(component, 1);
 }
 function make_env_instruction(environment) {
+    display("Make Env Instruction");
     return list("env", environment);
 }
 
@@ -496,6 +510,7 @@ function call_instruction_arity(component) {
    return list_ref(component, 1);
 }
 function make_call_instruction(arity) {
+    display("Make Call Instruction");
     return list("call", arity);
 }
 
@@ -514,6 +529,7 @@ function is_truthy(x) {
 // function objects
 
 function make_simple_function(parameters, body, env) {
+    display("Make Simple function");
     return list("simple_function", parameters, body, env);
 }
 function is_simple_function(f) {
@@ -542,6 +558,7 @@ function frame_symbols(frame) { return head(frame); }
 function frame_values(frame) { return tail(frame); }
 
 function extend_environment(symbols, vals, base_env) {
+    display("Extend Environment");
     return length(symbols) === length(vals)
            ? pair(make_frame(symbols, vals), base_env)
            : length(symbols) < length(vals)
@@ -554,6 +571,7 @@ function extend_environment(symbols, vals, base_env) {
 }
 
 function lookup_symbol_value(symbol, env) {
+    display("Lookup Symbol Value");
     function env_loop(env) {
         function scan(symbols, vals) {
             return is_null(symbols)
@@ -573,6 +591,7 @@ function lookup_symbol_value(symbol, env) {
 }
 
 function assign_symbol_value(symbol, val, env) {
+    display("Assign Symbol Value");
     function env_loop(env) {
         function scan(symbols, vals) {
             return is_null(symbols)
@@ -627,11 +646,13 @@ const primitive_constant_values =
     map(c => head(tail(c)), primitive_constants);
 
 function apply_primitive_function(fun, arglist) {
+    display("Apply Primitive Function");
     return apply_in_underlying_javascript(
                primitive_implementation(fun), arglist);
 }
 
 function setup_environment() {
+    display("Setup Environment");
     return extend_environment(append(primitive_function_symbols,
                                      primitive_constant_symbols),
                               append(primitive_function_objects, 
@@ -747,12 +768,7 @@ function parse_and_evaluate(string) {
 
 
 parse_and_evaluate(`
-function factorial(n) {
-    return n === 1
-           ? 1
-           : n * n-1;
-}
-factorial(5);`);
+const x = 1; { const x = 2; x; } x;`);
 
 
 /*
