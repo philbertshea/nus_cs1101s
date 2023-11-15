@@ -39,17 +39,31 @@ function mfib(n) {
         return result;          
     }
 }
+mfib(3);
 
 // Q3: Streams
-const s3 = pair(1, () => pair(-1, () => s3)); // Streams: Alternating Ones
+
+const altones = pair(1, () => pair(-1, () => altones)); // Streams: Alternating Ones
 
 function stream_map(f, s) {    // Lazy   
     return is_null(s) 
             ? null
             : pair(f(head(s)), 
                     () => stream_map(f, stream_tail(s)));
+}
+stream_map(x => x+1, altones);
 
 function eval_stream(s, n) {    // Not Lazy
     return n === 0 ? null
             : pair(head(s), eval_stream(stream_tail(s), n - 1));
 }
+
+function add_streams(s1, s2) {  // Lazy
+    return is_null(s1) ? s2
+            : is_null(s2) ? s1
+            : pair(head(s1) + head(s2),
+                () => add_streams(stream_tail(s1), stream_tail(s2)));
+}
+
+const zeros = add_streams(altones, stream_tail(altones));
+eval_stream(zeros, 5);
